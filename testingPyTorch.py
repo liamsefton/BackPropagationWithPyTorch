@@ -8,11 +8,11 @@ class ExampleNet(nn.Module):
     def __init__(self):
         super(ExampleNet, self).__init__()
         self.linear_relu_stack = nn.Sequential(
-            nn.Linear(11, 15), #input is size 11, hidden layer is size 15
+            nn.Linear(11, 7),
             nn.ReLU(),
-            nn.Linear(15, 5),  #input to hidden layer is size 15 output to output layer is size 5
+            nn.Linear(7, 3),
             nn.ReLU(),
-            nn.Linear(5, 1) #input to output layer is size 5, output is size 1 (scalar value of estimated wine quality)
+            nn.Linear(3, 1)
         )
 
     def forward(self, x):
@@ -20,7 +20,7 @@ class ExampleNet(nn.Module):
 
 model = ExampleNet()
 num_epochs = 50
-optimizer = optim.SGD(model.parameters(), lr=.0001) #learning rates higher than this tend to converge to local minima after first epoch
+optimizer = optim.SGD(model.parameters(), lr=.00005) #learning rates higher than this tend to converge to local minima after first epoch
 #Training
 for outer_loop in range(num_epochs):
     f = open("winequality-red.csv")
@@ -51,6 +51,7 @@ for outer_loop in range(num_epochs):
         #print(float(target.item() - output) ** 2)
     print(float(sum_differences))
 
+f.close()
 #Testing
 f = open("winequality-red.csv")
 f.readline()
@@ -64,4 +65,4 @@ for line in f:
     output = model(torch.FloatTensor(line))
     sum_differences += float(target.item() - output) ** 2
 
-print(sum_differences)
+print(float(sum_differences))
