@@ -8,11 +8,11 @@ class ExampleNet(nn.Module):
     def __init__(self):
         super(ExampleNet, self).__init__()
         self.linear_relu_stack = nn.Sequential(
-            nn.Linear(11, 15),
+            nn.Linear(11, 15), #input is size 11, hidden layer is size 15
             nn.ReLU(),
-            nn.Linear(15, 5),
+            nn.Linear(15, 5),  #input to hidden layer is size 15 output to output layer is size 5
             nn.ReLU(),
-            nn.Linear(5, 1)
+            nn.Linear(5, 1) #input to output layer is size 5, output is size 1 (scalar value of estimated wine quality)
         )
 
     def forward(self, x):
