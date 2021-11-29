@@ -8,24 +8,25 @@ class ExampleNet(nn.Module):
     def __init__(self):
         super(ExampleNet, self).__init__()
         self.linear_relu_stack = nn.Sequential(
-            nn.Linear(11, 7),
+            nn.Linear(11, 8),
             nn.ReLU(),
-            nn.Linear(7, 3),
+            nn.Linear(8, 5),
             nn.ReLU(),
-            nn.Linear(3, 1)
+            nn.Linear(5, 1)
         )
 
     def forward(self, x):
         return self.linear_relu_stack(x)
 
 model = ExampleNet()
-num_epochs = 50
-optimizer = optim.SGD(model.parameters(), lr=.00005) #learning rates higher than this tend to converge to local minima after first epoch
+num_epochs = 100
+optimizer = optim.SGD(model.parameters(), lr=.00001) #learning rates higher than this tend to converge to local minima after first epoch
 #Training
 for outer_loop in range(num_epochs):
-    f = open("winequality-red.csv")
+    f = open("training.csv")
     f.readline()
     sum_differences = 0
+    num_samples = 0
     for line in f:
         line = line.split(";")
         line = list(map(float, line))
@@ -38,7 +39,8 @@ for outer_loop in range(num_epochs):
         loss = loss_func(output, target)
         loss.backward()
         optimizer.step()
-        sum_differences += float(target.item() - output) ** 2
+        sum_differences += abs(float(target.item() - output))
+        num_samples += 1
         #print(float(output - target.item()) ** 2)
         #print(float(output))
         #loss_function = nn.MSELoss()
@@ -49,13 +51,14 @@ for outer_loop in range(num_epochs):
         #for f in model.parameters():
         #    f.data.sub_(f.grad.data * learning_rate)
         #print(float(target.item() - output) ** 2)
-    print(float(sum_differences))
+    print(float(sum_differences)/num_samples)
 
 f.close()
 #Testing
-f = open("winequality-red.csv")
+f = open("testing.csv")
 f.readline()
 sum_differences = 0
+num_samples = 0
 for line in f:
     line = line.split(";")
     line = list(map(float, line))
@@ -63,6 +66,8 @@ for line in f:
     target = torch.FloatTensor(target)
     line = line[:-1]
     output = model(torch.FloatTensor(line))
-    sum_differences += float(target.item() - output) ** 2
-
-print(float(sum_differences))
+    sum_differences += abs(float(target.item() - output))
+    num_samples += 1
+    #print(float(target.item() - output) ** 2)
+print("Testing result: ", end="")
+print(float(sum_differences)/num_samples)
