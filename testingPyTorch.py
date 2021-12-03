@@ -27,7 +27,7 @@ def init_weights(layer):
         layer.weight.data.fill_(0.0)
 
 model = ExampleNet()
-model.apply(init_weights)
+#model.apply(init_weights)
 num_epochs = 1000
 optimizer = optim.SGD(model.parameters(), lr=.00001) #learning rates higher than this tend to converge to local minima after first epoch
 testing_differences = -1
@@ -51,10 +51,11 @@ plt.ylabel("Average error on samples")
 #Training
 for outer_loop in range(num_epochs):
     if outer_loop % 10 == 0:
-        for group in optimizer.param_groups:
-            group['lr'] = group['lr'] - (group['lr']/10) #lowers weights slowly over time
+        #for group in optimizer.param_groups:
+        #    group['lr'] = group['lr'] - (group['lr']/10) #lowers weights slowly over time
         print(outer_loop)
-
+    for group in optimizer.param_groups:
+        group['lr'] = group['lr'] - (group['lr']/100)
     f = open("training.csv")
     f.readline()
     sum_differences = 0
@@ -124,10 +125,13 @@ for outer_loop in range(num_epochs):
     x_vals_testing.append(curr_epoch)
 
     if(max(x_vals_testing) > 49):
-        plt.xlim(1, max(x_vals_testing))
-    plt.ylim(0,float(sum_differences)/num_samples * 1.5)
+        plt.xlim(1, max(x_vals_testing) + 10)
+    if(float(sum_differences)/num_samples > 1):
+        plt.ylim(0,float(sum_differences)/num_samples * 1.5)
+    else:
+        plt.ylim(float(sum_differences)/num_samples * float(sum_differences)/num_samples,float(sum_differences)/num_samples * 1.5)
     plt.plot(x_vals_testing, testing_error_y_vals)
-    plt.pause(.1)
+    plt.pause(.01)
 
 if exit_code == -1:
     print("Training stopped after " + str(curr_epoch) + " epochs from reaching max epochs.")
